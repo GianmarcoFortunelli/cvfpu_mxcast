@@ -106,7 +106,12 @@ package fpnew_pkg;
       INT16: return 16;
       INT32: return 32;
       INT64: return 64;
-      default: return 8;
+      default: begin
+        // pragma translate_off
+        if (!$isunknown(ifmt)) $fatal(1, "Invalid INT format supplied");
+        // pragma translate_on
+        return 8; // non-zero so that width / int_width() stays finite while the format is X
+      end
     endcase
   endfunction
 
@@ -528,7 +533,12 @@ package fpnew_pkg;
       3: return 8;
       4: return 10;
       5: return 16;
-      default: return 8;
+      default: begin
+        // pragma translate_off
+        if (!$isunknown(idx)) $fatal(1, "Invalid op0 lane-count index supplied");
+        // pragma translate_on
+        return 8;
+      end
     endcase
   endfunction
 
@@ -674,9 +684,13 @@ package fpnew_pkg;
       FP6:     return 6;
       FP6ALT:  return 6;
       FP4:     return 4;
-      default: return 8;
+      default: begin
+        // pragma translate_off
+        if (!$isunknown(fmt)) $fatal(1, "Invalid FP format supplied");
+        // pragma translate_on
+        return 8; // non-zero so that width / fp_width() stays finite while the format is X
+      end
     endcase
-
   endfunction
 
   function automatic logic fp_width_gt(fp_format_e lhs, fp_format_e rhs);
