@@ -926,6 +926,16 @@ package fpnew_pkg;
                             |(mx_int_cfg & MXDOTP_FORMATS_MASK.src_int_formats))) ? 1 : 0;
   endfunction
 
+  // Number of lanes per FP format for a given width, as a table. Use this (indexed by a runtime
+  // format signal) instead of calling num_lanes() on a runtime format, which synthesizes a divider.
+  function automatic fmt_unsigned_t fmt_num_lanes(int unsigned width);
+    automatic fmt_unsigned_t res = '0;
+    for (int unsigned fmt = 0; fmt < NUM_FP_FORMATS; fmt++) begin
+      res[fmt] = num_lanes(width, fp_format_e'(fmt), 1'b1);
+    end
+    return res;
+  endfunction
+
   // Returns the number of CONV lanes to build. A conversion processes as many elements as fit
   // the wider of its two formats into `width`, so the narrowest enabled width never bounds the
   // lane count: use the second-smallest width, except when two formats share the smallest width

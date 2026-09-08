@@ -115,6 +115,7 @@ or on 16b inputs producing 32b outputs");
   localparam int unsigned NUM_DOTP_LANES = fpnew_pkg::num_dotp_lanes(Width, MERGED_FP_FORMATS);
   localparam int unsigned NUM_MX_LANES = fpnew_pkg::num_mxdotp_lanes(Width, MxFpFmtConfig, MxIntFmtConfig);
   localparam int unsigned NUM_CONV_LANES = fpnew_pkg::num_conv_lanes(Width, MERGED_FP_FORMATS, IntFmtConfig, MxFpFmtConfig, MxIntFmtConfig);
+  localparam fpnew_pkg::fmt_unsigned_t FMT_NUM_LANES = fpnew_pkg::fmt_num_lanes(Width);
   localparam int unsigned NUM_INT_FORMATS = fpnew_pkg::NUM_INT_FORMATS;
   // We will send the format information along with the data
   localparam int unsigned FMT_BITS =
@@ -224,20 +225,20 @@ or on 16b inputs producing 32b outputs");
 
     unique case (op_i)
       fpnew_pkg::F2M: begin
-        src_lanes = fpnew_pkg::num_lanes(Width, src_fmt_i, vectorial_op);
+        src_lanes = vectorial_op ? FMT_NUM_LANES[src_fmt_i] : 1;
         target_is_insert_d         = 1'b1;
         target_insert_nlanes_idx_d = fpnew_pkg::op0_nlanes_idx(src_lanes);
         target_insert_kind_d       = INSERT_FP;
       end
       fpnew_pkg::F2MI: begin
-        src_lanes = fpnew_pkg::num_lanes(Width, src_fmt_i, vectorial_op);
+        src_lanes = vectorial_op ? FMT_NUM_LANES[src_fmt_i] : 1;
         target_is_insert_d         = 1'b1;
         target_insert_nlanes_idx_d = fpnew_pkg::op0_nlanes_idx(src_lanes);
         target_insert_kind_d       = INSERT_INT;
       end
       fpnew_pkg::FNF: begin
         if (!is_up_cast) begin
-          src_lanes = fpnew_pkg::num_lanes(Width, src_fmt_i, 1'b1);
+          src_lanes = FMT_NUM_LANES[src_fmt_i];
           target_is_insert_d         = 1'b1;
           target_insert_nlanes_idx_d = fpnew_pkg::op0_nlanes_idx(src_lanes);
           target_insert_kind_d       = INSERT_FP;
@@ -408,8 +409,7 @@ or on 16b inputs producing 32b outputs");
 
       assign src_widx     = fpnew_pkg::op0_width_idx(fpnew_pkg::fp_width(src_fmt_i));
       assign int_widx     = fpnew_pkg::op0_width_idx(fpnew_pkg::int_width(int_fmt_i));
-      assign dst_nidx     = fpnew_pkg::op0_nlanes_idx(
-          fpnew_pkg::num_lanes(Width, dst_fmt_i, 1'b1));
+      assign dst_nidx     = fpnew_pkg::op0_nlanes_idx(FMT_NUM_LANES[dst_fmt_i]);
       assign subgroup_sel = {1'b0, slot_select_imm};
 
       // Precomputed operand-0 windows. Entry (widx, nidx, sg) holds element LANE of subgroup sg when
