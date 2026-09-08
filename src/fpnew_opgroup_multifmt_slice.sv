@@ -412,26 +412,34 @@ or on 16b inputs producing 32b outputs");
           fpnew_pkg::num_lanes(Width, dst_fmt_i, 1'b1));
       assign subgroup_sel = {1'b0, slot_select_imm};
 
+      // Precomputed operand-0 windows. Entry (widx, nidx, sg) holds element LANE of subgroup sg when
+      // operand 0 is viewed as groups of N elements of W bits, i.e. operands_i[0][BASE +: W] with
+      // BASE = (LANE + sg*N)*W. Only the bits that exist are wired, the rest is constant zero, and
+      // subgroups other than 0 are only reachable with EnableSlotSelect.
       for (genvar widx = 0; widx < fpnew_pkg::OP0_NUM_WIDTHS; widx++) begin : gen_op0_widths
         localparam int unsigned W = fpnew_pkg::op0_idx_to_width(widx);
+        localparam int unsigned WL = (W < LANE_WIDTH) ? W : LANE_WIDTH;          // bits the lane can take
         localparam int unsigned F2F_UPPER_BASE = LANE * W + (Width / 2);
-        for (genvar f2f_b = 0; f2f_b < fpnew_pkg::OP0_WINDOW_MAX_WIDTH; f2f_b++) begin : gen_op0_f2f_upper_bits
-          if (f2f_b < LANE_WIDTH && (F2F_UPPER_BASE + f2f_b) < Width) begin
-            assign op0_f2f_upper_table[widx][f2f_b] = operands_i[0][F2F_UPPER_BASE + f2f_b];
-          end else begin
-            assign op0_f2f_upper_table[widx][f2f_b] = 1'b0;
-          end
+        localparam int unsigned F2F_AVAIL = (Width > F2F_UPPER_BASE) ? Width - F2F_UPPER_BASE : 0;
+        localparam int unsigned F2F_NB = (WL < F2F_AVAIL) ? WL : F2F_AVAIL;      // bits that exist
+        if (F2F_NB > 0) begin : gen_op0_f2f_upper
+          assign op0_f2f_upper_table[widx][F2F_NB-1:0] = operands_i[0][F2F_UPPER_BASE +: F2F_NB];
+        end
+        if (F2F_NB < fpnew_pkg::OP0_WINDOW_MAX_WIDTH) begin : gen_op0_f2f_upper_pad
+          assign op0_f2f_upper_table[widx][fpnew_pkg::OP0_WINDOW_MAX_WIDTH-1:F2F_NB] = '0;
         end
         for (genvar nidx = 0; nidx < fpnew_pkg::OP0_NUM_NLANES; nidx++) begin : gen_op0_nlanes
           localparam int unsigned N = fpnew_pkg::op0_idx_to_nlanes(nidx);
           for (genvar sg = 0; sg < fpnew_pkg::OP0_NUM_SUBGROUPS; sg++) begin : gen_op0_subgroups
-            localparam int unsigned BASE = (LANE + sg * N) * W;
-            for (genvar b = 0; b < fpnew_pkg::OP0_WINDOW_MAX_WIDTH; b++) begin : gen_op0_bits
-              if (b < LANE_WIDTH && (BASE + b) < Width) begin
-                assign op0_window_table[widx][nidx][sg][b] = operands_i[0][BASE + b];    // nested mux construction
-              end else begin
-                assign op0_window_table[widx][nidx][sg][b] = 1'b0;
-              end
+            localparam int unsigned BASE  = (LANE + sg * N) * W;
+            localparam int unsigned AVAIL = (Width > BASE) ? Width - BASE : 0;
+            localparam int unsigned NB    = !(EnableSlotSelect || (sg == 0)) ? 0 :
+                                            (WL < AVAIL) ? WL : AVAIL;
+            if (NB > 0) begin : gen_op0_window
+              assign op0_window_table[widx][nidx][sg][NB-1:0] = operands_i[0][BASE +: NB];
+            end
+            if (NB < fpnew_pkg::OP0_WINDOW_MAX_WIDTH) begin : gen_op0_window_pad
+              assign op0_window_table[widx][nidx][sg][fpnew_pkg::OP0_WINDOW_MAX_WIDTH-1:NB] = '0;
             end
           end
         end
