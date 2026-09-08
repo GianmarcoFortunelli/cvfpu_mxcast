@@ -307,8 +307,9 @@ package fpnew_pkg;
   typedef struct packed {
     int unsigned    Width;
     logic           EnableVectors;
-    logic           EnableSlotSelect;
-    logic           EnableMXConv;
+    logic           EnableSlotSelect; // CONV insert ops write into a slot of the target operand selected by
+                                      // operands_i[2][35:32]; requires Width >= 64
+    logic           EnableMXConv;     // MX conversion datapath (M2F/F2M/MI2F/F2MI/MXSCALE/MXISCALE)
     logic           EnableNanBox;
     fmt_logic_t     FpFmtMask;    // Standard FP formats for all opgroups
     ifmt_logic_t    IntFmtMask;   // Standard INT formats for all opgroups
@@ -333,7 +334,7 @@ package fpnew_pkg;
   localparam fpu_features_t RV32D = '{
     Width:            64,
     EnableVectors:    1'b1,
-    EnableSlotSelect: 1'b1,
+    EnableSlotSelect: 1'b0,
     EnableMXConv:     1'b0,
     EnableNanBox:     1'b1,
     FpFmtMask:        9'b110000000,
@@ -362,7 +363,7 @@ package fpnew_pkg;
     EnableSlotSelect: 1'b1,
     EnableMXConv:     1'b1,
     EnableNanBox:     1'b1,
-    FpFmtMask:        9'b111111111,  // Standard formats (not including FP6, FP6ALT, FP4)
+    FpFmtMask:        9'b111111111,
     IntFmtMask:       4'b1111,
     MxFpFmtMask:      9'b000101111,  // MX formats: FP8, FP8ALT, FP6, FP6ALT, FP4
     MxIntFmtMask:     4'b1000,       // INT8 for MX operations
@@ -372,7 +373,7 @@ package fpnew_pkg;
   localparam fpu_features_t RV32F_Xsflt = '{
     Width:            32,
     EnableVectors:    1'b1,
-    EnableSlotSelect: 1'b1,
+    EnableSlotSelect: 1'b0,
     EnableMXConv:     1'b0,
     EnableNanBox:     1'b1,
     FpFmtMask:        9'b101111000,
@@ -385,7 +386,7 @@ package fpnew_pkg;
   localparam fpu_features_t RV32F_Xf16alt_Xfvec = '{
     Width:            32,
     EnableVectors:    1'b1,
-    EnableSlotSelect: 1'b1,
+    EnableSlotSelect: 1'b0,
     EnableMXConv:     1'b0,
     EnableNanBox:     1'b1,
     FpFmtMask:        9'b100010000,
@@ -425,19 +426,21 @@ package fpnew_pkg;
     PipeConfig: BEFORE
   };
 
+  // Format order in the per-format arrays below:
+  //             FP32 FP64 FP16 FP8 FP16ALT FP8ALT FP6 FP6ALT FP4
   localparam fpu_implementation_t DEFAULT_SNITCH_PIPE = '{
-    PipeRegs:   '{'{default: 3},  // ADDMUL
-                  '{default: 0},  // DIVSQRT
-                  '{default: 0},  // NONCOMP
-                  '{default: 2},  // CONV
-                  '{default: 3},  // DOTP
-                  '{default: 3}}, // MXDOTP
-    UnitTypes:  '{'{default: MERGED},   // ADDMUL
-                  '{default: MERGED},   // DIVSQRT
-                  '{default: PARALLEL}, // NONCOMP
-                  '{default: MERGED},   // CONV
-                  '{default: MERGED},   // DOTP
-                  '{default: MERGED}},  // MXDOTP
+    PipeRegs:   '{'{3, 2, 1, 0, 1, 0, 0, 0, 0},  // ADDMUL
+                  '{1, 0, 1, 0, 1, 0, 0, 0, 0},  // DIVSQRT
+                  '{0, 0, 0, 0, 0, 0, 0, 0, 0},  // NONCOMP
+                  '{2, 2, 2, 2, 2, 2, 2, 2, 2},  // CONV
+                  '{3, 3, 3, 3, 3, 3, 0, 0, 0},  // DOTP
+                  '{3, 3, 3, 3, 3, 3, 0, 0, 0}}, // MXDOTP
+    UnitTypes:  '{'{MERGED,   MERGED,   MERGED,   DISABLED, MERGED,   DISABLED, DISABLED, DISABLED, DISABLED}, // ADDMUL
+                  '{MERGED,   DISABLED, MERGED,   DISABLED, MERGED,   DISABLED, DISABLED, DISABLED, DISABLED}, // DIVSQRT
+                  '{PARALLEL, PARALLEL, PARALLEL, PARALLEL, PARALLEL, PARALLEL, DISABLED, DISABLED, DISABLED}, // NONCOMP
+                  '{MERGED,   MERGED,   MERGED,   MERGED,   MERGED,   MERGED,   MERGED,   MERGED,   MERGED},   // CONV: FP6, FP6ALT, FP4 only here
+                  '{MERGED,   MERGED,   MERGED,   MERGED,   MERGED,   MERGED,   DISABLED, DISABLED, DISABLED}, // DOTP
+                  '{MERGED,   MERGED,   MERGED,   MERGED,   MERGED,   MERGED,   DISABLED, DISABLED, DISABLED}}, // MXDOTP
     PipeConfig: INSIDE
   };
 
