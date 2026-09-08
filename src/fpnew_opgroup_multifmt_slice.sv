@@ -119,7 +119,7 @@ or on 16b inputs producing 32b outputs");
   // We will send the format information along with the data
   localparam int unsigned FMT_BITS =
       fpnew_pkg::maximum($clog2(NUM_FORMATS), $clog2(NUM_INT_FORMATS));
-  localparam int unsigned AUX_BITS = FMT_BITS + 4; // also add vectorial and integer flags
+  localparam int unsigned AUX_BITS = FMT_BITS + 5; // also add vectorial, integer, cpk and insert flags
 
   localparam int unsigned SELECTOR_BASE = 32;      // position of selector in op2
   localparam int unsigned SELECTOR_WIDTH = 4;
@@ -211,8 +211,8 @@ or on 16b inputs producing 32b outputs");
   // The destination format is the int format for F2I casts
   assign dst_fmt    = dst_fmt_is_int ? int_fmt_i : dst_fmt_i;
 
-  // The data sent along consists of the vectorial flag and format bits
-  assign aux_data      = {dst_is_cpk, dst_fmt_is_int, vectorial_op, dst_fmt, op_is_vsum};
+  // The data sent along consists of the vectorial flag and format bits.
+  assign aux_data      = {target_is_insert_d, dst_is_cpk, dst_fmt_is_int, vectorial_op, dst_fmt, op_is_vsum};
   assign target_aux_d  = dst_vec_op;
 
   always_comb begin : conv_target_insert_ctrl
@@ -1001,7 +1001,8 @@ or on 16b inputs producing 32b outputs");
     // decode the aux data
     assign result_vec_op = byp_pipe_aux_q[NumPipeRegs];
 
-    assign result_is_insert         = (byp_pipe_insert_kind_q[NumPipeRegs] != INSERT_NONE);
+    // result_is_insert comes from the lane aux data (see below); the bypass head only supplies the
+    // insert metadata and is popped together with the lane result it belongs to.
     assign result_insert_nlanes_idx = byp_pipe_insert_nlanes_idx_q[NumPipeRegs];
     assign result_insert_kind       = byp_pipe_insert_kind_q[NumPipeRegs];
 
@@ -1042,7 +1043,6 @@ or on 16b inputs producing 32b outputs");
     end
 
   end else begin : no_conv
-    assign result_is_insert = 1'b0;
     assign result_insert_nlanes_idx = '0;
     assign result_insert_slot = '0;
     assign result_insert_kind = INSERT_NONE;
@@ -1062,7 +1062,7 @@ or on 16b inputs producing 32b outputs");
   // ------------
   // Output Side
   // ------------
-  assign {result_is_cpk, result_fmt_is_int, result_is_vector, result_fmt, result_is_vsum} = lane_aux[0];
+  assign {result_is_insert, result_is_cpk, result_fmt_is_int, result_is_vector, result_fmt, result_is_vsum} = lane_aux[0];
 
   if (EnableSlotSelect) begin : gen_insert_slot_select
     logic [NUM_FORMATS-1:0][fpnew_pkg::OP0_NUM_NLANES-1:0]
