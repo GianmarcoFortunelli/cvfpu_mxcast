@@ -476,7 +476,7 @@ package fpnew_pkg;
   // Static window table for CONV operand-0 extraction
   localparam int unsigned OP0_NUM_WIDTHS    = 6;
   localparam int unsigned OP0_NUM_NLANES    = 6;
-  localparam int unsigned OP0_NUM_SUBGROUPS = 17;
+  localparam int unsigned OP0_NUM_SUBGROUPS = 17; // index 16 is never selectable with the 4-bit slot selector
   localparam int unsigned OP0_WINDOW_MAX_WIDTH = 64;
 
   typedef logic [OP0_WINDOW_MAX_WIDTH-1:0] op0_window_t;
@@ -586,6 +586,8 @@ package fpnew_pkg;
   endfunction
 
   // Selects a precomputed operand window by width, lane count, and subgroup.
+  // nlanes_idx 5 (16 lanes, i.e. an FP4 destination) has no arm on purpose: it is only used
+  // for up-casts, and FP4 is never an up-cast destination. Extend if a narrower format is added.
   function automatic op0_window_t pick_op0_window(
     input op0_window_table_t tab,
     input logic [2:0] width_idx,
@@ -924,8 +926,12 @@ package fpnew_pkg;
                             |(mx_int_cfg & MXDOTP_FORMATS_MASK.src_int_formats))) ? 1 : 0;
   endfunction
 
-  // Returns maximum conversions parallelism for the enabled formats.
-  // computed at compile time
+  // Returns the number of CONV lanes to build. A conversion processes as many elements as fit
+  // the wider of its two formats into `width`, so the narrowest enabled width never bounds the
+  // lane count: use the second-smallest width, except when two formats share the smallest width
+  // (same-width conversions such as INT8 <-> FP8) or when MX formats are present and the smallest
+  // standard width is >= 8 (MX conversions pair a standard format with an MX element format).
+  // Computed at compile time.
   function automatic int unsigned num_conv_lanes(int unsigned width,
                                                   fmt_logic_t fp_cfg,
                                                   ifmt_logic_t int_cfg,
