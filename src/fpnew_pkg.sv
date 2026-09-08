@@ -318,81 +318,81 @@ package fpnew_pkg;
   } fpu_features_t;
 
   localparam fpu_features_t RV64D = '{
-    Width:         64,
-    EnableVectors: 1'b0,
+    Width:            64,
+    EnableVectors:    1'b0,
     EnableSlotSelect: 1'b0,
-    EnableMXConv:  1'b0,
-    EnableNanBox:  1'b1,
-    FpFmtMask:     9'b110000000,
-    IntFmtMask:    4'b0011,
-    MxFpFmtMask:   9'b0,         // No MX support
-    MxIntFmtMask:  4'b0,
-    PaceFeatures: '{default: 0}
+    EnableMXConv:     1'b0,
+    EnableNanBox:     1'b1,
+    FpFmtMask:        9'b110000000,
+    IntFmtMask:       4'b0011,
+    MxFpFmtMask:      9'b0,         // No MX support
+    MxIntFmtMask:     4'b0,
+    PaceFeatures:    '{default: 0}
   };
 
   localparam fpu_features_t RV32D = '{
-    Width:         64,
-    EnableVectors: 1'b1,
+    Width:            64,
+    EnableVectors:    1'b1,
     EnableSlotSelect: 1'b1,
-    EnableMXConv:  1'b0,
-    EnableNanBox:  1'b1,
-    FpFmtMask:     9'b110000000,
-    IntFmtMask:    4'b0010,
-    MxFpFmtMask:   9'b0,         // No MX support
-    MxIntFmtMask:  4'b0,
-    PaceFeatures: '{default: 0}
+    EnableMXConv:     1'b0,
+    EnableNanBox:     1'b1,
+    FpFmtMask:        9'b110000000,
+    IntFmtMask:       4'b0010,
+    MxFpFmtMask:      9'b0,         // No MX support
+    MxIntFmtMask:     4'b0,
+    PaceFeatures:    '{default: 0}
   };
 
   localparam fpu_features_t RV32F = '{
-    Width:         32,
-    EnableVectors: 1'b0,
+    Width:            32,
+    EnableVectors:    1'b0,
     EnableSlotSelect: 1'b0,
-    EnableMXConv:  1'b0,
-    EnableNanBox:  1'b1,
-    FpFmtMask:     9'b100000000,
-    IntFmtMask:    4'b0010,
-    MxFpFmtMask:   9'b0,         // No MX support
-    MxIntFmtMask:  4'b0,
-    PaceFeatures: '{default: 0}
+    EnableMXConv:     1'b0,
+    EnableNanBox:     1'b1,
+    FpFmtMask:        9'b100000000,
+    IntFmtMask:       4'b0010,
+    MxFpFmtMask:      9'b0,         // No MX support
+    MxIntFmtMask:     4'b0,
+    PaceFeatures:    '{default: 0}
   };
 
   localparam fpu_features_t RV64D_Xsflt = '{
-    Width:         64,
-    EnableVectors: 1'b1,
+    Width:            64,
+    EnableVectors:    1'b1,
     EnableSlotSelect: 1'b1,
-    EnableMXConv:  1'b1,
-    EnableNanBox:  1'b1,
-    FpFmtMask:     9'b111111111,  // Standard formats (not including FP6, FP6ALT, FP4)
-    IntFmtMask:    4'b1111,
-    MxFpFmtMask:   9'b000101111,  // MX formats: FP8, FP8ALT, FP6, FP6ALT, FP4
-    MxIntFmtMask:  4'b1000,       // INT8 for MX operations
-    PaceFeatures:  DEFAULT_PACE_FEATURES
+    EnableMXConv:     1'b1,
+    EnableNanBox:     1'b1,
+    FpFmtMask:        9'b111111111,  // Standard formats (not including FP6, FP6ALT, FP4)
+    IntFmtMask:       4'b1111,
+    MxFpFmtMask:      9'b000101111,  // MX formats: FP8, FP8ALT, FP6, FP6ALT, FP4
+    MxIntFmtMask:     4'b1000,       // INT8 for MX operations
+    PaceFeatures:     DEFAULT_PACE_FEATURES
   };
 
   localparam fpu_features_t RV32F_Xsflt = '{
-    Width:         32,
-    EnableVectors: 1'b1,
+    Width:            32,
+    EnableVectors:    1'b1,
     EnableSlotSelect: 1'b1,
-    EnableMXConv:  1'b0,
-    EnableNanBox:  1'b1,
-    FpFmtMask:     9'b101111000,
-    IntFmtMask:    4'b1110,
-    MxFpFmtMask:   9'b0,         // No MX support (32-bit width insufficient)
-    MxIntFmtMask:  4'b0,
-    PaceFeatures: '{default: 0}
+    EnableMXConv:     1'b0,
+    EnableNanBox:     1'b1,
+    FpFmtMask:        9'b101111000,
+    IntFmtMask:       4'b1110,
+    MxFpFmtMask:      9'b0,         // No MX support (32-bit width insufficient)
+    MxIntFmtMask:     4'b0,
+    PaceFeatures:    '{default: 0}
   };
 
   localparam fpu_features_t RV32F_Xf16alt_Xfvec = '{
-    Width:         32,
-    EnableVectors: 1'b1,
+    Width:            32,
+    EnableVectors:    1'b1,
     EnableSlotSelect: 1'b1,
-    EnableMXConv:  1'b0,
-    EnableNanBox:  1'b1,
-    FpFmtMask:     9'b100010000,
-    IntFmtMask:    4'b0110,
-    MxFpFmtMask:   9'b0,         // No MX support
-    MxIntFmtMask:  4'b0,
-    PaceFeatures: '{default: 0}
+    EnableMXConv:     1'b0,
+    EnableNanBox:     1'b1,
+    FpFmtMask:        9'b100010000,
+    IntFmtMask:       4'b0110,
+    MxFpFmtMask:      9'b0,         // No MX support
+    MxIntFmtMask:     4'b0,
+    PaceFeatures:    '{default: 0}
   };
 
 

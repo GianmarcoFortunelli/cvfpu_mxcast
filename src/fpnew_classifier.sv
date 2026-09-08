@@ -102,4 +102,3 @@ module fpnew_classifier #(
     end
   end
 endmodule
-

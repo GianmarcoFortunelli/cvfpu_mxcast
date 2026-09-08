@@ -19,20 +19,20 @@ module fpnew_opgroup_multifmt_slice #(
   parameter fpnew_pkg::opgroup_e      OpGroup        = fpnew_pkg::CONV,
   parameter int unsigned              Width          = 64,
   // FPU configuration
-  parameter fpnew_pkg::fmt_logic_t     FpFmtConfig    = '1,
-  parameter fpnew_pkg::ifmt_logic_t    IntFmtConfig   = '1,
-  parameter fpnew_pkg::fmt_logic_t     MxFpFmtConfig  = '0,  // MX-specific FP formats
-  parameter fpnew_pkg::ifmt_logic_t    MxIntFmtConfig = '0,  // MX-specific INT formats
+  parameter fpnew_pkg::fmt_logic_t      FpFmtConfig    = '1,
+  parameter fpnew_pkg::ifmt_logic_t     IntFmtConfig   = '1,
+  parameter fpnew_pkg::fmt_logic_t      MxFpFmtConfig  = '0,  // MX-specific FP formats
+  parameter fpnew_pkg::ifmt_logic_t     MxIntFmtConfig = '0,  // MX-specific INT formats
   parameter fpnew_pkg::fmt_unit_types_t FmtUnitTypes  = '{default: fpnew_pkg::MERGED},
-  parameter logic                      EnableVectors  = 1'b1,
-  parameter logic                      EnableSlotSelect = 1'b1,
-  parameter logic                      EnableMXConv   = 1'b1,
-  parameter fpnew_pkg::divsqrt_unit_t  DivSqrtSel     = fpnew_pkg::THMULTI,
-  parameter int unsigned               NumPipeRegs    = 0,
-  parameter fpnew_pkg::pipe_config_t   PipeConfig     = fpnew_pkg::BEFORE,
-  parameter fpnew_pkg::pace_features_t PaceFeatures   = '{default: 0},
-  parameter type                       TagType        = logic,
-  parameter fpnew_pkg::rsr_impl_t      StochasticRndImplementation = fpnew_pkg::DEFAULT_NO_RSR,
+  parameter logic                       EnableVectors  = 1'b1,
+  parameter logic                       EnableSlotSelect = 1'b1,
+  parameter logic                       EnableMXConv   = 1'b1,
+  parameter fpnew_pkg::divsqrt_unit_t   DivSqrtSel     = fpnew_pkg::THMULTI,
+  parameter int unsigned                NumPipeRegs    = 0,
+  parameter fpnew_pkg::pipe_config_t    PipeConfig     = fpnew_pkg::BEFORE,
+  parameter fpnew_pkg::pace_features_t  PaceFeatures   = '{default: 0},
+  parameter type                        TagType        = logic,
+  parameter fpnew_pkg::rsr_impl_t       StochasticRndImplementation = fpnew_pkg::DEFAULT_NO_RSR,
   // Do not change
   localparam int unsigned NUM_OPERANDS = fpnew_pkg::num_operands(OpGroup),
   localparam int unsigned NUM_FORMATS  = fpnew_pkg::NUM_FP_FORMATS,
