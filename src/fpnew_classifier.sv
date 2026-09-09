@@ -64,24 +64,19 @@ module fpnew_classifier #(
         is_nan    = 1'b0;
         is_normal = is_boxed && (value.exponent != '0);
       end
-    end else if (FpFormat == fpnew_pkg::fp_format_e'(fpnew_pkg::FP8ALT)) begin : gen_fp8alt
+    end else begin : gen_classification
       always_comb begin : classify_input
-        if (src_is_mx) begin
-          // E4M3: No infinity, NaN when exp=all1s and man=all1s
+        if ((FpFormat == fpnew_pkg::fp_format_e'(fpnew_pkg::FP8ALT)) && src_is_mx) begin
+          // MX E4M3
           is_inf    = 1'b0;
           is_nan    = !is_boxed || ((value.exponent == '1) && (value.mantissa == '1));
           is_normal = is_boxed && (value.exponent != '0) && !is_nan;
         end else begin
+          // Standard IEEE-754 classification.
           is_inf    = is_boxed && ((value.exponent == '1) && (value.mantissa == '0));
           is_nan    = !is_boxed || ((value.exponent == '1) && (value.mantissa != '0));
           is_normal = is_boxed && (value.exponent != '0) && (value.exponent != '1);
         end
-      end
-    end else begin : gen_ieee
-      always_comb begin : classify_input
-        is_inf    = is_boxed && ((value.exponent == '1) && (value.mantissa == '0));
-        is_nan    = !is_boxed || ((value.exponent == '1) && (value.mantissa != '0));
-        is_normal = is_boxed && (value.exponent != '0) && (value.exponent != '1);
       end
     end
 
