@@ -122,7 +122,7 @@ or on 16b inputs producing 32b outputs");
       fpnew_pkg::maximum($clog2(NUM_FORMATS), $clog2(NUM_INT_FORMATS));
   localparam int unsigned AUX_BITS = FMT_BITS + 5; // also add vectorial, integer, cpk and insert flags
 
-  localparam int unsigned SELECTOR_BASE = 32;      // position of selector in op2
+  localparam int unsigned SELECTOR_BASE = 8;       // position of selector in op2
   localparam int unsigned SELECTOR_WIDTH = 4;
   localparam int unsigned INSERT_NUM_SLOTS = 16;   // max parallelism
 
