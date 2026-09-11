@@ -18,7 +18,7 @@ Versions of the IP in the same major relase are "pin-compatible" with each other
 - **Breaking**: `fpu_features_t` gains the `EnableSlotSelect` and `EnableMXConv` fields; existing feature literals must add both (set them to `1'b0` to keep the previous behaviour)
 - `fpnew_cast_multi` takes three operands (`operands_i[0]` source, `[1]` insert target, `[2]` MX scale) and gains the `MxFpFmtConfig`, `MxIntFmtConfig` and `EnableMXScale` parameters
 - `fpnew_classifier` replaces the `MX` parameter with a runtime `src_is_mx` input; FP6, FP6ALT and FP4 are always classified as finite-only (they have no Inf/NaN encodings)
-- `RV64D_Xsflt.FpFmtMask` now includes FP6, FP6ALT and FP4 so that `CONV` can build lanes for them; `NumLanes` of `fpnew_top` grows from 8 to 16 and `simd_mask_i` doubles in width for this configuration. Note that `FpFmtMask` applies to every opgroup: an implementation that does not mark FP6/FP6ALT/FP4 as `DISABLED` for `ADDMUL`, `NONCOMP`, `DIVSQRT` and `DOTP` gets untested FP6/FP4 FMA and comparison lanes
+- `FNF` between two MX-only formats (FP6, FP6ALT, FP4 on both sides) requires both formats in `FpFmtMask`; every other MX conversion only needs them in `MxFpFmtMask`. The predefined `RV64D_Xsflt` keeps them out of `FpFmtMask`, so `NumLanes` and `simd_mask_i` are unchanged
 - `DEFAULT_SNITCH_PIPE` is now specified per format: FP6, FP6ALT and FP4 are enabled for `CONV` only and `DISABLED` elsewhere, `ADDMUL` is `MERGED` for FP32/FP64/FP16/FP16ALT only (no FP8/FP8ALT FMA), `DIVSQRT` is `MERGED` for FP32/FP16/FP16ALT only, and the pipeline depths are ADDMUL 2 (FP32/FP64) / 1 (FP16/FP16ALT), DIVSQRT 1, NONCOMP 0, CONV 2, DOTP 3, MXDOTP 3
 - Merged opgroup slices only build lanes for formats whose unit type is `MERGED` for that opgroup
 

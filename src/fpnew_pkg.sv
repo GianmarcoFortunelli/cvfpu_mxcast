@@ -368,7 +368,7 @@ package fpnew_pkg;
     EnableSlotSelect: 1'b1,
     EnableMXConv:     1'b1,
     EnableNanBox:     1'b1,
-    FpFmtMask:        9'b111111111,
+    FpFmtMask:        9'b111111000,  // Standard formats (not including FP6, FP6ALT, FP4)
     IntFmtMask:       4'b1111,
     MxFpFmtMask:      9'b000101111,  // MX formats: FP8, FP8ALT, FP6, FP6ALT, FP4
     MxIntFmtMask:     4'b1000,       // INT8 for MX operations
