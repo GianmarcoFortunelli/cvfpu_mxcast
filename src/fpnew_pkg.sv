@@ -313,7 +313,7 @@ package fpnew_pkg;
     int unsigned    Width;
     logic           EnableVectors;
     logic           EnableSlotSelect; // CONV insert ops write into a slot of the target operand selected by
-                                      // operands_i[2][12:8]
+                                      // operands_i[2][11:8]
     logic           EnableMXConv;     // MX conversion datapath (M2F/F2M/MI2F/F2MI/MXSCALE/MXISCALE)
     logic           EnableNanBox;
     fmt_logic_t     FpFmtMask;    // Standard FP formats for all opgroups

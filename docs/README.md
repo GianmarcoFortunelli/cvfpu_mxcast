@@ -54,7 +54,7 @@ As the width of some input/output signals is defined by the configuration, it is
 | `clk_i`          | in        | `logic`              | Clock, synchronous, rising-edge triggered                      |
 | `rst_ni`         | in        | `logic`              | Asynchronous reset, active low                                 |
 | `hart_id_i`      | in        | `logic [31:0]`       | Core ID, used only when stochastic rounding is enabled         |
-| `operands_i`     | in        | `logic [2:0][W-1:0]` | Operands, henceforth referred to as `op[`*i*`]`. For `CONV` insert operations `op[1]` is the target vector, `op[2][7:0]` the E8M0 block scale and `op[2][12:8]` the slot selector |
+| `operands_i`     | in        | `logic [2:0][W-1:0]` | Operands, henceforth referred to as `op[`*i*`]`. For `CONV` insert operations `op[1]` is the target vector, `op[2][7:0]` the E8M0 block scale and `op[2][11:8]` the slot selector |
 | `rnd_mode_i`     | in        | `roundmode_e`        | Floating-point rounding mode                                   |
 | `op_i`           | in        | `operation_e`        | Operation select                                               |
 | `op_mod_i`       | in        | `logic`              | Operation modifier                                             |
@@ -131,7 +131,7 @@ Unless noted otherwise, the first operand `op[0]` is used for the operation.
 | `CPKAB`    | `1`      | Cast-and-pack `op[0]` and `op[1]` to entries 2, 3 of vector `op[2]`.                                                                                                                                             |
 | `CPKCD`    | `0`      | Cast-and-pack `op[0]` and `op[1]` to entries 4, 5 of vector `op[2]`.                                                                                                                                             |
 | `CPKCD`    | `1`      | Cast-and-pack `op[0]` and `op[1]` to entries 6, 7 of vector `op[2]`.                                                                                                                                             |
-| `FNF`      | `0`      | FP to FP cast between formats whose widths are not a power-of-two ratio apart (e.g. FP16 to FP6). Vectorial down-casts insert the result into the slot of `op[1]` selected by `op[2][12:8]`, up-casts take the selected source group |
+| `FNF`      | `0`      | FP to FP cast between formats whose widths are not a power-of-two ratio apart (e.g. FP16 to FP6). Vectorial down-casts insert the result into the slot of `op[1]` selected by `op[2][11:8]`, up-casts take the selected source group |
 | `M2F`      | `0`      | MX FP to FP cast: `op[0]` (`src_fmt_i`) scaled by the E8M0 block scale `op[2][7:0]`, converted to `dst_fmt_i`                                                                                                     |
 | `F2M`      | `0`      | FP to MX FP cast: `op[0]` (`src_fmt_i`) divided by the block scale `op[2][7:0]`, converted (saturating) to `dst_fmt_i` and inserted into the selected slot of `op[1]`                                            |
 | `MI2F`     | `0`      | As `M2F` with INT8 source elements (`int_fmt_i`)                                                                                                                                                                 |
@@ -290,9 +290,9 @@ For example, given `Width = 64`, there will be four execution units for every op
 
 ##### `EnableSlotSelect` - Slot Insert Hardware Generation
 
-If set to `1`, `CONV` insert operations (`F2M`, `F2MI`, `FNF` down-casts, `MXSCALE`, `MXISCALE`) write their result into the slot of `op[1]` selected by `op[2][12:8]`, and vectorial up-casts take the source group selected by the same field.
+If set to `1`, `CONV` insert operations (`F2M`, `F2MI`, `FNF` down-casts, `MXSCALE`, `MXISCALE`) write their result into the slot of `op[1]` selected by `op[2][11:8]`, and vectorial up-casts take the source group selected by the same field.
 One operation converts as many elements as fit the wider of the two formats into `Width` (e.g. 2 for FP32 to FP4, 8 for FP8 to FP4), so a full narrow vector is converted with several operations targeting successive slots.
-Requires `Width >= 64`; if set to `0` only slot 0 is used.
+If set to `0` only slot 0 is used.
 
 *Default*: `1'b1`
 
