@@ -120,6 +120,7 @@ Unless noted otherwise, the first operand `op[0]` is used for the operation.
 | `SGNJ`     | `0`      | Sign injection, operation encoded in rounding mode<br>`RNE`: `op[0]` with `sign(op[1])`<br>`RTZ`: `op[0]` with `~sign(op[1])`<br>`RDN`: `op[0]` with `sign(op[0]) ^ sign(op[1])`<br>`RUP`: `op[0]` (passthrough) |
 | `SGNJ`     | `1`      | As above, but result is sign-extended instead of NaN-Boxed                                                                                                                                                       |
 | `MINMAX`   | `0`      | Minimum / maximum, operation encoded in rounding mode<br>`RNE`: `minimumNumber(op[0], op[1])`<br>`RTZ`: `maximumNumber(op[0], op[1])`                                                                            |
+| `MINMAX`   | `1`      | As above on the magnitudes: the signs of `op[0]` and `op[1]` are cleared before the comparison and the selected magnitude is returned (absolute minimum / maximum)                                               |
 | `CMP`      | `0`      | Comparison, operation encoded in rounding mode<br>`RNE`: `op[0] <= op[1]`<br>`RTZ`: `op[0] < op[1]`<br>`RDN`: `op[0] == op[1]`                                                                                   |
 | `CLASSIFY` | `0`      | Classification, returns RISC-V classification block                                                                                                                                                              |
 | `F2F`      | `0`      | FP to FP cast, formats given by `src_fmt_i` and `dst_fmt_i`                                                                                                                                                      |
@@ -138,7 +139,6 @@ Unless noted otherwise, the first operand `op[0]` is used for the operation.
 | `F2MI`     | `0`      | As `F2M` with INT8 result elements (`int_fmt_i`)                                                                                                                                                                 |
 | `MXSCALE`  | `0`      | E8M0 block scale that maps `op[0]` (`src_fmt_i`) onto the largest exponent of the MX format `dst_fmt_i`, inserted as a byte into the selected slot of `op[1]`. Inf/NaN give `0xFF`, zero `0x00`, saturates at `0xFE` |
 | `MXISCALE` | `0`      | As `MXSCALE` for INT8 element blocks                                                                                                                                                                             |
-| `MINMAX_P` | `0`      | Snitch wrapper marker, converted to `MINMAX` before `fpnew_top`; not implemented by the FPU                                                                                                                       |
 | `PWPA`      | `0`      | Piecewise polynomial approximation via PACE (no inv/sqrt/rsqrt scaling). Requires PACE enabled in `Features.PaceFeatures`.                                                                                      |
 | `PACE_INV`  | `0`      | PACE reciprocal (1/op[0]).
 | `PACE_SQRT` | `0`      | PACE square root.                                  |

@@ -13,6 +13,7 @@ Versions of the IP in the same major relase are "pin-compatible" with each other
 - Add MX conversion operations to the `CONV` opgroup: `M2F`/`F2M` (MX FP <-> FP with a shared E8M0 scale), `MI2F`/`F2MI` (MX INT8 <-> FP), `MXSCALE`/`MXISCALE` (E8M0 scale computation) and `FNF` (FP -> FP conversion between formats whose widths are not a power-of-two multiple apart)
 - Add slot insert mechanism to `fpnew_opgroup_multifmt_slice`: the converted group of a `CONV` insert operation is written into a slot of the target operand (`operands_i[1]`), the slot being selected by `operands_i[2][11:8]`
 - Add `EnableSlotSelect` and `EnableMXConv` fields to `fpu_features_t` to enable the slot insert mechanism and the MX conversion datapath
+- `MINMAX` with `op_mod_i` set compares and returns the magnitudes of `op[0]` and `op[1]` (absolute minimum / maximum); `op_mod_i` was previously ignored by `MINMAX`
 
 ### Changed
 - **Breaking**: `fpu_features_t` gains the `EnableSlotSelect` and `EnableMXConv` fields; existing feature literals must add both (set them to `1'b0` to keep the previous behaviour)
